@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "cosmerecraft:steel_nugget"
+  },
+  "result": "cosmerecraft:small_steel_dust",
+  "count": 1
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:blasting",
+  "ingredient": {
+    "item": "cosmerecraft:steel_dust"
+  },
+  "result": "cosmerecraft:steel_ingot",
+  "cookingtime": 200
+}
