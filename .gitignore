@@ -39,3 +39,6 @@ forge*changelog.txt
 
 # PDT-specific
 .buildpath
+
+# Dev env mods
+.libs
