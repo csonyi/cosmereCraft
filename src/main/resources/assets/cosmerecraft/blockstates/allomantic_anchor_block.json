@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north": {
+      "model":"cosmerecraft:block/allomantic_anchor_block_north"
+    },
+    "facing=east": {
+      "model":"cosmerecraft:block/allomantic_anchor_block_east"
+    },
+    "facing=west": {
+      "model":"cosmerecraft:block/allomantic_anchor_block_west"
+    },
+    "facing=south": {
+      "model":"cosmerecraft:block/allomantic_anchor_block_south"
+    }
+  }
+}

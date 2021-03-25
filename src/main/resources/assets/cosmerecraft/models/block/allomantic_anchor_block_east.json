@@ -1,0 +1,35 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "cosmerecraft:block/allomantic_anchor_block",
+		"particle": "cosmerecraft:block/allomantic_anchor_block"
+	},
+	"elements": [
+		{
+			"from": [4, 2, 8],
+			"to": [5, 4, 9],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [12, 10, 16]},
+			"faces": {
+				"north": {"uv": [0, 0, 4, 8], "texture": "#0"},
+				"east": {"uv": [0, 0, 4, 8], "texture": "#0"},
+				"south": {"uv": [0, 0, 4, 8], "texture": "#0"},
+				"west": {"uv": [0, 0, 4, 8], "texture": "#0"},
+				"up": {"uv": [5, 0, 9, 4], "texture": "#0"},
+				"down": {"uv": [5, 0, 9, 4], "texture": "#0"}
+			}
+		},
+		{
+			"from": [5, 2, 8],
+			"to": [6, 3, 9],
+			"rotation": {"angle": 22.5, "axis": "z", "origin": [13, 10, 16]},
+			"faces": {
+				"north": {"uv": [5, 0, 9, 4], "texture": "#0"},
+				"east": {"uv": [5, 0, 9, 4], "texture": "#0"},
+				"south": {"uv": [5, 0, 9, 4], "texture": "#0"},
+				"west": {"uv": [5, 0, 9, 4], "texture": "#0"},
+				"up": {"uv": [5, 0, 9, 4], "texture": "#0"},
+				"down": {"uv": [5, 0, 9, 4], "texture": "#0"}
+			}
+		}
+	]
+}
