@@ -16,6 +16,9 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.server.command.EnumArgument;
 
+/**
+ * Implements a game command to add metallic ability to the current player
+ */
 public class AddMetalCommand implements Command<CommandSource> {
   private static final AddMetalCommand CMD = new AddMetalCommand();
 

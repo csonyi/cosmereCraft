@@ -14,6 +14,9 @@ import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Set;
 
+/**
+ * Implements a command to query the metals the current player has access to.
+ */
 public class GetMetalsCommand implements Command<CommandSource> {
   private static final GetMetalsCommand CMD = new GetMetalsCommand();
 

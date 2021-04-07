@@ -17,6 +17,9 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.server.command.EnumArgument;
 
+/**
+ * Implements a game command to add reserve for a metal to current player.
+ */
 public class AddReserveCommand implements Command<CommandSource> {
   private static final AddReserveCommand CMD = new AddReserveCommand();
 

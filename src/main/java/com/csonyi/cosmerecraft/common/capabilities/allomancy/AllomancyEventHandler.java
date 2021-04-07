@@ -27,9 +27,16 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Set;
 
+/**
+ * Event handler class for the Allomancy Capability
+ */
 public class AllomancyEventHandler {
   private static final Logger LOGGER = LogManager.getLogger();
 
+  /**
+   * Attaches the Allomantic capability to players
+   * @param event
+   */
   @SubscribeEvent
   public static void onAttachCapabilitiesEvent(AttachCapabilitiesEvent<Entity> event) {
     Entity entity = event.getObject();
@@ -42,6 +49,10 @@ public class AllomancyEventHandler {
     }
   }
 
+  /**
+   * Capabilities have to be synced to the client manually, so we do it at login
+   * @param event
+   */
   @SubscribeEvent
   public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
     PlayerEntity player = event.getPlayer();
@@ -51,6 +62,11 @@ public class AllomancyEventHandler {
     }
   }
 
+  /**
+   * Capabilities have to be synced manually, so we make sure that after the player dies,
+   * the new instance gets the old data
+   * @param event
+   */
   @SubscribeEvent
   public static void onPlayerDeath(PlayerEvent.Clone event) {
     if(!event.isWasDeath()) return;
@@ -61,6 +77,10 @@ public class AllomancyEventHandler {
     CapabilityAllomancy.ALLOMANCY_CAPABILITY.readNBT(CapabilityAllomancy.getAllomancy(newPlayer), null, oldAllomancyNBT);
   }
 
+  /**
+   * This handler is responsible for handling the hovering during allomantic jumping
+   * @param event
+   */
   @SubscribeEvent
   public static void onHoverKeyEvent(InputEvent.KeyInputEvent event) {
     int keyAction = event.getAction();
@@ -78,6 +98,12 @@ public class AllomancyEventHandler {
     if(keyAction == GLFW.GLFW_RELEASE) allomancy.calculateHoverHeight(null);
   }
 
+  /**
+   * This handler is responsible for handling the "burning" of metals.
+   * If a metallic power is activated (is in the DefaultAllomancy.burningMetals Set),
+   * the reserves of the metal have to be decreased.
+   * @param event
+   */
   @SubscribeEvent
   public static void burningHandler(TickEvent.PlayerTickEvent event) {
     PlayerEntity player = event.player;
@@ -85,15 +111,22 @@ public class AllomancyEventHandler {
     Set<InvestedMetal> burningMetals = allomancy.getBurning();
     for(InvestedMetal metal : burningMetals) {
       if(allomancy.hasReserve(metal)) {
-        if(metal.hasTickingEffect) allomancy.applyMetalEffect(metal, player);
+        if(metal.hasTickingEffect) NetworkHandler.sendMetalEffectPacket(player, metal);
         allomancy.burn(metal);
       } else {
         allomancy.stopBurning(metal);
       }
     }
-    allomancy.tickEffects();
   }
 
+  /**
+   * This handler is responsible for allomantic jumping.
+   * Jumps can be charged by holding down the associated key,
+   * and executed by releasing it.
+   * If for some reason the player isn't able to jump (doesn't have the required metal/has no reserve for it/no anchor in range),
+   * they will jump instead.
+   * @param event
+   */
   @SubscribeEvent
   public static void allomanticJumpHandler(TickEvent.PlayerTickEvent event) {
     PlayerEntity player = event.player;
@@ -127,10 +160,23 @@ public class AllomancyEventHandler {
     }
   }
 
+  /**
+   * Utility function for getting a World's anchor handler capability.
+   * TODO: move to anchor handler capability implementation class
+   * @param world
+   * @return
+   */
   private static IAnchorHandler getAnchorHandler(World world) {
     return world.getCapability(CapabilityAnchorHandler.ANCHOR_HANDLER_CAPABILITY).orElse(null);
   }
 
+  /**
+   * Utility function for code readability reasons.
+   * @param player
+   * @param allomancy
+   * @param anchorHandler
+   * @return
+   */
   private static boolean canPush(PlayerEntity player, IAllomancy allomancy, IAnchorHandler anchorHandler) {
     return allomancy != null
         && anchorHandler != null

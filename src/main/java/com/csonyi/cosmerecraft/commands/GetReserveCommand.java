@@ -12,6 +12,9 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 
+/**
+ * Implements a command to query the reserves the current player has access to.
+ */
 public class GetReserveCommand implements Command<CommandSource> {
   private static final GetReserveCommand CMD = new GetReserveCommand();
 

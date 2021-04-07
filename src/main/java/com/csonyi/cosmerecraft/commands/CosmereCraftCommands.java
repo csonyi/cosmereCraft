@@ -6,6 +6,9 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 
+/**
+ * Main command registration class for the mod.
+ */
 public class CosmereCraftCommands {
   public static void register(CommandDispatcher<CommandSource> dispatcher) {
     LiteralCommandNode<CommandSource> cosmereCraftCommands = dispatcher.register(

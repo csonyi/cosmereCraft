@@ -16,6 +16,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
+/**
+ * Handles the registration of common components
+ */
 @Mod.EventBusSubscriber(
         modid = CosmereCraft.MOD_ID,
         bus = Mod.EventBusSubscriber.Bus.FORGE

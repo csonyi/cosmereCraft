@@ -5,6 +5,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Interface for Allomantic Capabilities
+ */
 public interface IAllomancy {
   Set<InvestedMetal> getMetals();
   void setMetals(Set<InvestedMetal> metals);
@@ -48,8 +51,6 @@ public interface IAllomancy {
   void calculateHoverHeight(PlayerEntity player);
 
   void applyMetalEffect(InvestedMetal metal, PlayerEntity player);
-  void tickEffects();
-
 
   void update(Set<InvestedMetal> metals, Map<InvestedMetal, Float> reserves,
               Set<InvestedMetal> burningMetals, boolean hasAtium, float atiumReserve

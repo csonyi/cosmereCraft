@@ -8,6 +8,9 @@ import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This class keeps inputs consistent across the logical sides.
+ */
 public final class InputHandler {
   private static final Map<PlayerEntity, Boolean> HOLDING_CHARGE = new HashMap<>();
   private static final Map<PlayerEntity, Boolean> HOLDING_HOVER = new HashMap<>();

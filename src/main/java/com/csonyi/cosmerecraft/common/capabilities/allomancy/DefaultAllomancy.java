@@ -18,12 +18,26 @@ import java.util.Map;
 import java.util.Set;
 
 // TODO: balance burn rate
+
+/**
+ * Default (and the only) implementation of the IAllomancy interface.
+ *  This class handles the allomantic abilities of players
+ *    non-final class members:
+ *      metals - Contains the metallic powers the player has access to
+ *      reserves - Contains the reserves for each metal
+ *      burningMetals - Contains the metals currently burned by the player
+ *      pushPower - Current pushing power for allomantic jumps in [0, 100]
+ *      hoverHeight - The y component of the players position for hovering
+ *    The metal "Atium" is handled separately from the others. The following members are related to that:
+ *      hasAtium - Whether the player has access to Atium
+ *      atiumReserve - Current atium reserve
+ */
 public class DefaultAllomancy implements IAllomancy {
   private static final Logger LOGGER = LogManager.getLogger();
   public final int MAX_PUSH_POWER = 100;
   public final float MAX_RESERVES = 1000F;
   public final float BURN_RATE_PER_TICK = 0.1F;
-  public final int EFFECT_DURATION = 5 * 20;
+  public final int EFFECT_DURATION = 15 * 20;
 
   private final Set<InvestedMetal> metals = new HashSet<>();
   private final Map<InvestedMetal, Float> reserves = new HashMap<>();
@@ -33,8 +47,6 @@ public class DefaultAllomancy implements IAllomancy {
 
   private boolean hasAtium = false;
   private float atiumReserve = 0F;
-
-  private int effectOn = 0;
 
   @Override
   public Set<InvestedMetal> getMetals() {
@@ -60,6 +72,8 @@ public class DefaultAllomancy implements IAllomancy {
   public void removeMetal(InvestedMetal metal) {
   metals.remove(metal);
   }
+
+  // Atium is handled separately from regular metals
 
   @Override
   public void setAtium(boolean hasAtium) {
@@ -243,6 +257,7 @@ public class DefaultAllomancy implements IAllomancy {
 
   @Override
   public void applyMetalEffect(InvestedMetal metal, PlayerEntity player) {
+    if(player.world.getGameTime() % 80L != 0L) return;
     switch (metal) {
       case PEWTER:
         applyPewterBuff(player);
@@ -280,35 +295,32 @@ public class DefaultAllomancy implements IAllomancy {
   }
 
   private void applyPewterBuff(PlayerEntity player) {
-    if(effectOn >= EFFECT_DURATION - 5) {
-      int amplifier = (isBurning(InvestedMetal.DURALUMIN)) ? 9 : 1;
-      player.addPotionEffect(new EffectInstance(Effects.STRENGTH, EFFECT_DURATION, amplifier, false, false));
-    }
+    int weakAmplifier = (isBurning(InvestedMetal.DURALUMIN)) ? 1 : 0;
+    int strongAmplifier = (isBurning(InvestedMetal.DURALUMIN)) ? 4 : 0;
+    player.addPotionEffect(new EffectInstance(Effects.STRENGTH, EFFECT_DURATION, strongAmplifier, false, false));
+    player.addPotionEffect(new EffectInstance(Effects.SPEED, EFFECT_DURATION, 0, false, false));
+    player.addPotionEffect(new EffectInstance(Effects.JUMP_BOOST, EFFECT_DURATION, weakAmplifier, false, false));
+    player.addPotionEffect(new EffectInstance(Effects.HASTE, EFFECT_DURATION, 0, false, false));
+    player.addPotionEffect(new EffectInstance(Effects.REGENERATION, EFFECT_DURATION, 0, false, false));
+    player.addPotionEffect(new EffectInstance(Effects.RESISTANCE, EFFECT_DURATION, weakAmplifier, false, false));
   }
 
   private void applyTinBuff(PlayerEntity player) {
-    if(effectOn >= EFFECT_DURATION - 5) {
-      if(isBurning(InvestedMetal.DURALUMIN)) {
-        player.addPotionEffect(new EffectInstance(Effects.BLINDNESS, EFFECT_DURATION * 5, 0, false, false));
-        player.addPotionEffect(new EffectInstance(Effects.NAUSEA, EFFECT_DURATION * 5, 0, false, false));
-      } else player.addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, EFFECT_DURATION, 0, false, false));
+    if(isBurning(InvestedMetal.DURALUMIN)) {
+      player.addPotionEffect(new EffectInstance(Effects.BLINDNESS, EFFECT_DURATION * 5, 0, false, false));
+      player.addPotionEffect(new EffectInstance(Effects.NAUSEA, EFFECT_DURATION * 5, 0, false, false));
     }
+    else player.addPotionEffect(new EffectInstance(Effects.NIGHT_VISION, EFFECT_DURATION, 0, false, false));
   }
 
+  // Speeds up the passing of time
   private void applyCadmiumEffect() {
 
   }
 
+  // Accelerates TileEntity ticks around the player
   private void applyBendalloyEffect() {
 
-  }
-
-  @Override
-  public void tickEffects() {
-    if(effectOn < EFFECT_DURATION - 5) {
-      effectOn++;
-    }
-    effectOn = 0;
   }
 
   @Override

@@ -1,6 +1,9 @@
 package com.csonyi.cosmerecraft.renderer;
 
 import com.csonyi.cosmerecraft.common.block.AllomanticAnchorTile;
+import com.csonyi.cosmerecraft.common.capabilities.allomancy.CapabilityAllomancy;
+import com.csonyi.cosmerecraft.common.capabilities.allomancy.IAllomancy;
+import com.csonyi.cosmerecraft.common.capabilities.allomancy.InvestedMetal;
 import com.csonyi.cosmerecraft.setup.Registration;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -20,8 +23,12 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.util.OptionalDouble;
 
+/**
+ * Renders allomantic lines if specific abilities are activated.
+ */
 public class AllomanticLineRenderer extends TileEntityRenderer<AllomanticAnchorTile> {
   public AllomanticLineRenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
     super(rendererDispatcherIn);
@@ -31,6 +38,8 @@ public class AllomanticLineRenderer extends TileEntityRenderer<AllomanticAnchorT
   public void render(AllomanticAnchorTile anchor, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int combinedLight, int combinedOverlay) {
     PlayerEntity player = Minecraft.getInstance().player;
     if(player == null) return;
+    IAllomancy allomancy = CapabilityAllomancy.getAllomancy(player);
+    if(!(allomancy.isBurning(InvestedMetal.STEEL) || allomancy.isBurning(InvestedMetal.IRON))) return;
 
     TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(Blocks.CHAIN.getRegistryName());
 
@@ -56,10 +65,12 @@ public class AllomanticLineRenderer extends TileEntityRenderer<AllomanticAnchorT
   }
 
   private void addLine(IVertexBuilder renderer, MatrixStack matrixStack, Vector3d playerPos, Vector3d anchorPos, TextureAtlasSprite sprite) {
-    float r = 0;
-    float g = 113;
-    float b = 242;
-    float a = 50;
+    Color lineColor = Color.CYAN;
+    float cu = 1F / 255F;
+    float r = cu * lineColor.getRed();
+    float g = cu * lineColor.getGreen();
+    float b = cu * lineColor.getBlue();
+    float a = 0.5F;
     Vector3d relativePlayerPos = playerPos.subtract(anchorPos);
 
     renderer.pos(matrixStack.getLast().getMatrix(), 0.5F, 0F, 0.5F)

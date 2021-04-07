@@ -16,12 +16,23 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 
+/**
+ * Implements the Item for the allomantic anchor.
+ */
 public class AllomanticAnchorItem extends Item {
   public AllomanticAnchorItem() {
     super(new Item.Properties()
             .group(ModSetup.COSMERECRAFT_GROUP));
   }
 
+  /**
+   * Handles the throwing of the item.
+   * TODO: tweak to be consistent with active powers
+   * @param world
+   * @param player
+   * @param hand
+   * @return
+   */
   @Override
   public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
     ItemStack held = player.getHeldItem(hand);

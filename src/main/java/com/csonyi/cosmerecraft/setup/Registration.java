@@ -22,6 +22,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
+/**
+ * Handles the registration of Items, Blocks, Entities, TileEntities, etc...
+ */
 public class Registration {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, CosmereCraft.MOD_ID);

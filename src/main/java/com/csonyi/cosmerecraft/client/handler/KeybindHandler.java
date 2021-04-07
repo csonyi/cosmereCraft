@@ -33,7 +33,6 @@ public class KeybindHandler {
 
   private static boolean charging = false;
   private static boolean hovering = false;
-  private static boolean guiOpen = false;
 
   public static void init() {
     keyCharging = registerKeyBind("keybind.charging", GLFW.GLFW_KEY_SPACE);
@@ -41,6 +40,11 @@ public class KeybindHandler {
     openGui = registerKeyBind("keybind.gui", GLFW.GLFW_KEY_O);
   }
 
+  /**
+   * Event handler responsible for updating the InputHandler class,
+   * so movement related inputs are always in sync.
+   * @param tickEvent
+   */
   @SubscribeEvent
   public void onClientTick(TickEvent.ClientTickEvent tickEvent) {
     Minecraft mc = Minecraft.getInstance();
@@ -54,10 +58,9 @@ public class KeybindHandler {
       boolean hoveringNow = keyHovering.isKeyDown();
       boolean guiOpenNow = openGui.isKeyDown();
 
-      if(chargingNow != charging || hoveringNow != hovering || guiOpenNow != guiOpen) {
+      if(chargingNow != charging || hoveringNow != hovering) {
         charging = chargingNow;
         hovering = hoveringNow;
-        guiOpen = guiOpenNow;
 
         NetworkHandler.syncInputs(chargingNow, hoveringNow);
         InputHandler.update(player, chargingNow, hoveringNow);
@@ -72,6 +75,13 @@ public class KeybindHandler {
     }
   }
 
+  /**
+   * Function for registering keybindings..
+   * Improves code readability.
+   * @param name
+   * @param key
+   * @return
+   */
   private static KeyBinding registerKeyBind(String name, int key) {
     KeyBinding newKeyBind = new KeyBinding(CosmereCraft.MOD_ID + name, key, CosmereCraft.MOD_ID);
     ClientRegistry.registerKeyBinding(newKeyBind);

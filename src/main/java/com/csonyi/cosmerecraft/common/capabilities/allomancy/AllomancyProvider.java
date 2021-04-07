@@ -12,6 +12,9 @@ import net.minecraftforge.common.util.LazyOptional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * This class handles the capability for each player instance.
+ */
 public class AllomancyProvider implements ICapabilitySerializable<CompoundNBT> {
   private final DefaultAllomancy allomancy = new DefaultAllomancy();
   private final LazyOptional<IAllomancy> allomancyOptional = LazyOptional.of(() -> allomancy);

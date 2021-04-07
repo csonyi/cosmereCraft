@@ -11,6 +11,10 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import javax.annotation.Nullable;
 import java.awt.*;
 
+/**
+ * This class handles the serialization of the allomantic capability,
+ * and provides utility functions for it.
+ */
 public class CapabilityAllomancy {
   @CapabilityInject(IAllomancy.class)
   public static Capability<IAllomancy> ALLOMANCY_CAPABILITY = null;
@@ -19,7 +23,13 @@ public class CapabilityAllomancy {
     CapabilityManager.INSTANCE.register(IAllomancy.class, new Storage(), DefaultAllomancy::new);
   }
 
+  public static void read(IAllomancy instance, CompoundNBT nbt) {
+    ALLOMANCY_CAPABILITY.readNBT(instance, null, nbt);
+  }
 
+  public static CompoundNBT write(IAllomancy instance) {
+    return (CompoundNBT) ALLOMANCY_CAPABILITY.writeNBT(instance, null);
+  }
 
   public static class Storage implements Capability.IStorage<IAllomancy> {
     @Nullable
@@ -86,6 +96,10 @@ public class CapabilityAllomancy {
     return player.getCapability(ALLOMANCY_CAPABILITY).orElse(null);
   }
 
+  /**
+   * Utility class for GodMetals
+   * TODO: refactor this, may even deletable if not needed
+   */
   public enum GodMetal {
     ATIUM(Color.LIGHT_GRAY),
     LERASIUM(Color.YELLOW);

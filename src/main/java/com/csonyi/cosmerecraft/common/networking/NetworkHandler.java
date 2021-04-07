@@ -3,8 +3,10 @@ package com.csonyi.cosmerecraft.common.networking;
 import com.csonyi.cosmerecraft.CosmereCraft;
 import com.csonyi.cosmerecraft.common.capabilities.allomancy.CapabilityAllomancy;
 import com.csonyi.cosmerecraft.common.capabilities.allomancy.IAllomancy;
+import com.csonyi.cosmerecraft.common.capabilities.allomancy.InvestedMetal;
 import com.csonyi.cosmerecraft.common.capabilities.anchorhandler.CapabilityAnchorHandler;
 import com.csonyi.cosmerecraft.common.capabilities.anchorhandler.IAnchorHandler;
+import com.csonyi.cosmerecraft.common.networking.messages.ApplyMetalEffectMessage;
 import com.csonyi.cosmerecraft.common.networking.messages.UpdateAllomancyMessage;
 import com.csonyi.cosmerecraft.common.networking.messages.UpdateAnchorsMessage;
 import com.csonyi.cosmerecraft.common.networking.messages.UpdateInputMessage;
@@ -16,6 +18,10 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
+/**
+ * This class handles communication between logical sides,
+ * and the registration of message packet Objects.
+ */
 public class NetworkHandler {
   private static int id = 0;
   public static SimpleChannel INSTANCE;
@@ -30,12 +36,17 @@ public class NetworkHandler {
     INSTANCE.registerMessage(id(), UpdateInputMessage.class, UpdateInputMessage::write, UpdateInputMessage::read, UpdateInputMessage::onMessage);
     INSTANCE.registerMessage(id(), UpdateAllomancyMessage.class, UpdateAllomancyMessage::write, UpdateAllomancyMessage::read, UpdateAllomancyMessage::onMessage);
     INSTANCE.registerMessage(id(), UpdateAnchorsMessage.class, UpdateAnchorsMessage::write, UpdateAnchorsMessage::read, UpdateAnchorsMessage::onMessage);
+    INSTANCE.registerMessage(id(), ApplyMetalEffectMessage.class, ApplyMetalEffectMessage::write, ApplyMetalEffectMessage::read, ApplyMetalEffectMessage::onMessage);
   }
 
   private static int id() {
     return id++;
   }
 
+  /**
+   * Utility function to sync capability to client
+   * @param player
+   */
   public static void syncAllomancy(ServerPlayerEntity player) {
     IAllomancy allomancy = CapabilityAllomancy.getAllomancy(player);
     INSTANCE.send(
@@ -44,6 +55,10 @@ public class NetworkHandler {
     );
   }
 
+  /**
+   * Utility function to sync capability to client
+   * @param world
+   */
   public static void syncAnchors(World world) {
     IAnchorHandler anchorHandler = world.getCapability(CapabilityAnchorHandler.ANCHOR_HANDLER_CAPABILITY).orElse(null);
     INSTANCE.send(
@@ -55,7 +70,21 @@ public class NetworkHandler {
     );
   }
 
+  /**
+   * Utility function to sync inputs to server
+   * @param charging
+   * @param hovering
+   */
   public static void syncInputs(boolean charging, boolean hovering) {
     INSTANCE.sendToServer(new UpdateInputMessage(charging, hovering));
+  }
+
+  /**
+   * Utility function used to notify server about applying ability buffs.
+   * @param player
+   * @param metal
+   */
+  public static void sendMetalEffectPacket(PlayerEntity player, InvestedMetal metal) {
+    INSTANCE.sendToServer(new ApplyMetalEffectMessage(player, metal));
   }
 }

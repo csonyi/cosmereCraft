@@ -27,6 +27,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This is the class for the ability selection interface.
+ * Clarification:
+ *  GR - golden ratio
+ *  segment - slice of a circle. [0...7]
+ *  level - Inner or outer part of the circle [0...1]
+ *  sector - A level and a segment make a sector.
+ */
 public class MetalSelector extends Screen {
   private static final float GR = 1.61803398875F;
   private static final int SEGMENTS = 8;
@@ -55,6 +63,19 @@ public class MetalSelector extends Screen {
     burningMetals = allomancy.getBurning();
   }
 
+  /**
+   * The render function of the GUI.
+   * The GUI is made up of the slices of two circles, a smaller and a larger one,
+   * with symbols and text rendered on top of them.
+   * The color of the sectors depend on whether the associated metal is burning
+   * or the mouse is hovering over it.
+   * The larger circle gets renders first, then the smaller one, then the text and symbols.
+   * TODO: correct terminology
+   * @param matrixStack
+   * @param mouseX
+   * @param mouseY
+   * @param partialTicks
+   */
   @Override
   public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
     super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -76,6 +97,7 @@ public class MetalSelector extends Screen {
     RenderSystem.shadeModel(GL11.GL_SMOOTH);
     buffer.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
 
+    // Rendering the circles
     for(int level = LEVELS - 1; level >= 0; level--) {
       for(int segment = 0; segment < SEGMENTS; segment++) {
         InvestedMetal metal = InvestedMetal.getMetalFromGuiSector(segment, level);
@@ -124,6 +146,7 @@ public class MetalSelector extends Screen {
     RenderSystem.shadeModel(GL11.GL_FLAT);
     RenderSystem.enableTexture();
 
+    // Rendering the metal names and textures
     for(int level = LEVELS - 1; level >= 0; level--) {
       for(int segment = 0; segment < SEGMENTS; segment++) {
         InvestedMetal metal = InvestedMetal.getMetalFromGuiSector(segment, level);
@@ -145,6 +168,9 @@ public class MetalSelector extends Screen {
         int textYCorrected = textY - textHeightCorrection;
         float rotation = textRotationForSegment(segment);
 
+        // To rotate the text correctly the render matrix gets translated to the appropriate position,
+        // and rotated, and then back after the text is rendered
+        // TODO: optimize this, so the matrix isn't moved back to the origo at every iteration
         matrixStack.translate(textX, textY, 0);
         matrixStack.rotate(new Quaternion(0, 0, rotation, false));
         matrixStack.translate(-textX, -textY, 0);
@@ -158,9 +184,7 @@ public class MetalSelector extends Screen {
         int iconX = (int) ((screenCenterX + MathHelper.cos(radians) * iconRadius) - 16);
         int iconY = (int) ((screenCenterY + MathHelper.sin(radians) * iconRadius) - 16);
 
-        ResourceLocation texture = METAL_TEXTURES.get(metal);
-        if(texture == null) texture = LERASIUM_TEXTURE;
-
+        ResourceLocation texture = METAL_TEXTURES.getOrDefault(metal, LERASIUM_TEXTURE);
         mc.textureManager.bindTexture(texture);
         blit(matrixStack, iconX, iconY, 0, 0, 32, 32, 32, 32);
       }
@@ -176,6 +200,13 @@ public class MetalSelector extends Screen {
     timeIn++;
   }
 
+  /**
+   * This function handles mouse clicks on the GUI.
+   * @param mouseX
+   * @param mouseY
+   * @param button
+   * @return
+   */
   @Override
   public boolean mouseClicked(double mouseX, double mouseY, int button) {
     if(selectedSector[0] == -1 || selectedSector[1] == -1) return false;
@@ -187,14 +218,40 @@ public class MetalSelector extends Screen {
     return true;
   }
 
+  /**
+   * Calculates a central angle between the vector to the mouse pointer, and a point,
+   * with the point as the center of the circle. The right-side horizontal radius is considered 0deg
+   * increasing clockwise.
+   * @param x X coordinate of the center of the circle
+   * @param y Y coordinate of the center of the circle
+   * @param mouseX
+   * @param mouseY
+   * @return a value in [0.0...360.0)
+   */
   private static double mouseAngle(int x, int y, int mouseX, int mouseY) {
     return (MathHelper.atan2(mouseY - y, mouseX - x) + Math.PI * 2) % (Math.PI * 2);
   }
 
+  /**
+   * Calculates the distance of the mouse pointer relative to a point.
+   * @param x
+   * @param y
+   * @param mouseX
+   * @param mouseY
+   * @return
+   */
   private static double mouseDistance(int x, int y, int mouseX, int mouseY) {
     return MathHelper.sqrt(Math.pow(x - mouseX, 2) + Math.pow(y - mouseY, 2));
   }
 
+  /**
+   * Function to determine whether mouse is in a sector.
+   * @param segment
+   * @param level
+   * @param mouseAngle
+   * @param mouseDistance
+   * @return
+   */
   private static boolean mouseInSector(int segment, int level, double mouseAngle, double mouseDistance) {
     boolean mouseInSegment = DEG_PER_SEGMENT * segment < mouseAngle
                           && mouseAngle < DEG_PER_SEGMENT * (segment + 1);
@@ -206,20 +263,26 @@ public class MetalSelector extends Screen {
     return mouseInSegment && mouseInLevel;
   }
 
+  /**
+   * Calculates the alternating grayscale gradient for a sector.
+   * @param segment
+   * @param level
+   * @return
+   */
   private int getSectorColor(int segment, int level) {
-    int grayscaleValue = 0x44;
+    int grayscaleValue = 68; // 0x44
     if(segment % 2 == 0) {
-      return (level == 0) ? grayscaleValue : grayscaleValue + 0x19;
+      return (level == 0) ? grayscaleValue : grayscaleValue + 25; // 0x19
     }
-    return (level == 0) ? grayscaleValue + 0x19 : grayscaleValue;
+    return (level == 0) ? grayscaleValue + 25 : grayscaleValue;
   }
 
   /**
    * Calculates the radius of the current segment and level of the metal selection ring.
-   * @param segment Index of the current segment (0 - 7, starting from 3'o clock)
-   * @param level Index of the current level (0 - inner ring, 1 - outer ring)
+   * @param segment
+   * @param level
    * @param partialTicks fraction of a tick passed since the last full game tick
-   * @return radius of the current sector
+   * @return
    */
   private float calculateRadius(int segment, int level, float partialTicks) {
     return Math.max(0F, Math.min((timeIn + partialTicks - segment * 6F / SEGMENTS) * 40F, SECTOR_MAX_RADIUS[level]));
@@ -227,11 +290,11 @@ public class MetalSelector extends Screen {
 
   /**
    * Calculates the radius where the sectors metal icon texture is rendered.
-   * @param sectorRadius The radius of the current sector
-   * @param segment Index of the current segment (0 - 7, starting from 3'o clock)
-   * @param level Index of the current level (0 - inner ring, 1 - outer ring)
+   * @param sectorRadius
+   * @param segment
+   * @param level
    * @param partialTicks fraction of a tick passed since the last full game tick
-   * @return radius where the metal texture will be rendered
+   * @return
    */
   private int calculateIconRadius(float sectorRadius, int segment, int level, float partialTicks) {
     return (level == 0)
@@ -239,10 +302,22 @@ public class MetalSelector extends Screen {
             : (int) (sectorRadius - (sectorRadius - calculateRadius(segment, 0, partialTicks)) / 2);
   }
 
+  /**
+   * Calculates the radius where the sectors metal name is rendered.
+   * @param segment
+   * @param level
+   * @param partialTicks fraction of a tick passed since the last full game tick
+   * @return
+   */
   private float calculateTextRadius(int segment, int level, float partialTicks) {
     return calculateRadius(segment, 0, partialTicks) + ((level == 0) ? -font.FONT_HEIGHT : font.FONT_HEIGHT);
   }
 
+  /**
+   * Helper function for clientside key press detection.
+   * @param keybind
+   * @return
+   */
   private boolean isKeyDown(KeyBinding keybind) {
     InputMappings.Input key = keybind.getKey();
     if (key.getType() == InputMappings.Type.MOUSE) {
@@ -251,6 +326,12 @@ public class MetalSelector extends Screen {
     return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), key.getKeyCode());
   }
 
+  /**
+   * Small function to determine the rotation of the metal names.
+   * Improves code readability.
+   * @param segment
+   * @return
+   */
   private float textRotationForSegment(int segment) {
     switch (segment) {
       case 1:

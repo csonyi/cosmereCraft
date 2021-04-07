@@ -13,6 +13,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.world.World;
 
+/**
+ * Item class for edible metal nuggets.
+ */
 public class EdibleNugget extends Item {
   private GodMetal godMetal;
 
@@ -31,6 +34,13 @@ public class EdibleNugget extends Item {
     this.godMetal = godMetal;
   }
 
+  /**
+   * When player finishes consuming the item, apply the associated effect.
+   * @param stack
+   * @param worldIn
+   * @param entityLiving
+   * @return
+   */
   @Override
   public ItemStack onItemUseFinish(ItemStack stack, World worldIn, LivingEntity entityLiving) {
     if(!(entityLiving instanceof PlayerEntity)) return super.onItemUseFinish(stack, worldIn, entityLiving);

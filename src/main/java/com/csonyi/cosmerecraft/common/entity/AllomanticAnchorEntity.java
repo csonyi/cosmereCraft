@@ -24,6 +24,9 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Implements the thrown entity for the allomantic anchor item and block
+ */
 public class AllomanticAnchorEntity extends ProjectileItemEntity {
   private static final Logger LOGGER = LogManager.getLogger();
 
@@ -49,6 +52,10 @@ public class AllomanticAnchorEntity extends ProjectileItemEntity {
     return Registration.ALLOMANTIC_ANCHOR_ITEM.get();
   }
 
+  /**
+   * Create anchor block on impact, and add it to the anchor handler.
+   * @param result
+   */
   @Override
   protected void onImpact(RayTraceResult result) {
     // Get the shooter entity

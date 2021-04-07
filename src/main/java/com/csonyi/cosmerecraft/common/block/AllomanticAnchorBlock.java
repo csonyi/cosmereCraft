@@ -24,6 +24,9 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
+/**
+ * Implements the block used for allomantic jumping.
+ */
 public class AllomanticAnchorBlock extends Block implements IWaterLoggable {
   private static final DirectionProperty BLOCK_FACE = HorizontalBlock.HORIZONTAL_FACING;
   private static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
@@ -63,6 +66,7 @@ public class AllomanticAnchorBlock extends Block implements IWaterLoggable {
    * This method is not deprecated,
    * it is marked as such to indicate that if it is needed,
    * it has to be overwritten.
+   * @return the VoxelShape for the Facing of this block.
    */
   @SuppressWarnings("deprecation")
   @Override
@@ -124,6 +128,13 @@ public class AllomanticAnchorBlock extends Block implements IWaterLoggable {
     return new AllomanticAnchorTile();
   }
 
+  /**
+   * If block is mined, remove the associated TileEntity
+   * @param worldIn
+   * @param pos
+   * @param state
+   * @param player
+   */
   @Override
   public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
     super.onBlockHarvested(worldIn, pos, state, player);
@@ -133,6 +144,13 @@ public class AllomanticAnchorBlock extends Block implements IWaterLoggable {
     }
   }
 
+  /**
+   * If block blows up, remove the associated TileEntity
+   * @param state
+   * @param world
+   * @param pos
+   * @param explosion
+   */
   @Override
   public void onBlockExploded(BlockState state, World world, BlockPos pos, Explosion explosion) {
     if(world.getTileEntity(pos) instanceof AllomanticAnchorTile) {
@@ -141,6 +159,12 @@ public class AllomanticAnchorBlock extends Block implements IWaterLoggable {
     }
   }
 
+  /**
+   * Utility function for getting a World's anchor handler capability.
+   * TODO: move to anchor handler capability implementation class
+   * @param world
+   * @return
+   */
   private IAnchorHandler getAnchorHandler(World world) {
     return world.getCapability(CapabilityAnchorHandler.ANCHOR_HANDLER_CAPABILITY).orElse(null);
   }
